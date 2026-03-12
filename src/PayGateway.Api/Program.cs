@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using PayGateway.Api.Endpoints;
+using PayGateway.Api.Middleware;
+using PayGateway.Api.Swagger;
 using PayGateway.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,9 +19,12 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "Payment gateway simulation (PIX, card). Portfolio project aligned with Senior .NET Backend (fintech/POS) roles."
     });
+    options.OperationFilter<SwaggerExampleFilter>();
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {

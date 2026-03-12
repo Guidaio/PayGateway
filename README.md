@@ -84,6 +84,6 @@ Connection string in `appsettings.json`:
 
 ## Status
 
-**Etapa 3 concluída.** POST /payments (idempotent), GET /payments/{id}. Next: ProblemDetails middleware, API Key auth.
+**Etapa 4 concluída.** ExceptionHandlerMiddleware (500 com ProblemDetails), Swagger com exemplos. Next: API Key auth.
 
 See `portfolio-notes.md` for the roadmap and execution history.
