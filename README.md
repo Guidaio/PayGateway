@@ -15,7 +15,7 @@ PayGateway is an API that simulates a **payment gateway** for processing PIX and
 ```
 ┌─────────────────┐     ┌──────────────────────────┐     ┌─────────────────────┐
 │  PayGateway.Api │────▶│ PayGateway.Infrastructure │────▶│  PayGateway.Domain  │
-│  (minimal APIs) │     │  (EF Core, services)      │     │  (entities, logic)  │
+│  (minimal APIs) │     │  (EF Core, SQLite)        │     │  (Payment, enums)   │
 │  /api/v1/*      │     │  (future: Polly, etc.)    │     │                     │
 └─────────────────┘     └──────────────────────────┘     └─────────────────────┘
 ```
@@ -23,8 +23,8 @@ PayGateway is an API that simulates a **payment gateway** for processing PIX and
 | Project | Description |
 |---------|-------------|
 | **PayGateway.Api** | Web API (.NET 8, minimal APIs). Endpoints, Swagger, versioning. |
-| **PayGateway.Domain** | Domain entities and business logic (to be added). |
-| **PayGateway.Infrastructure** | Persistence, external services, Polly policies (to be added). |
+| **PayGateway.Domain** | Domain entities: Payment, enums (PaymentMethod, PaymentStatus, PixKeyType, CardBrand). |
+| **PayGateway.Infrastructure** | EF Core, PaymentDbContext, SQLite persistence, Fluent API configurations. |
 
 ## Prerequisites
 
@@ -46,8 +46,20 @@ Base path: `/api/v1` (to be added).
 |--------|----------|-------------|
 | GET | /health | Health check (public) |
 
+## Configuration
+
+Connection string in `appsettings.json`:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=paygateway.db"
+  }
+}
+```
+
 ## Status
 
-**Scaffold complete.** Next steps: domain model (Payment, Transaction), API Key auth, PIX/card endpoints, webhooks, Polly.
+**Etapa 2 concluída.** Domain model (Payment, PIX/Card enums) + EF Core + SQLite. Next: POST /payments, GET /payments/{id}.
 
 See `portfolio-notes.md` for the roadmap and execution history.

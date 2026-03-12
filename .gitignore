@@ -32,6 +32,7 @@ artifacts/
 *.db
 *.db-shm
 *.db-wal
+paygateway.db
 
 # Coverage
 coverage*.json
