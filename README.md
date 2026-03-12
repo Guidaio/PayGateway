@@ -40,11 +40,35 @@ Swagger UI: http://localhost:5000/swagger (or port shown in console).
 
 ## API (v1)
 
-Base path: `/api/v1` (to be added).
+Base path: `/api/v1`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | /health | Health check (public) |
+| GET | /payments/{id} | Get payment by ID |
+| POST | /payments | Create payment (idempotent; use `Idempotency-Key` header) |
+
+### Example: create PIX payment
+
+```bash
+curl -X POST http://localhost:5162/api/v1/payments \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: pay-001" \
+  -d '{"merchantId":"merchant-123","amount":99.99,"currency":"BRL","method":0,"pixKey":"user@example.com","pixKeyType":0}'
+```
+
+Method: 0 = Pix, 1 = Card. PixKeyType: 0 = Email, 1 = Cpf, 2 = Phone, 3 = Random.
+
+### Example: create card payment
+
+```bash
+curl -X POST http://localhost:5162/api/v1/payments \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: pay-002" \
+  -d '{"merchantId":"merchant-123","amount":150.00,"currency":"BRL","method":1,"cardLast4":"4242","cardBrand":0}'
+```
+
+CardBrand: 0 = Visa, 1 = Mastercard, 2 = Elo, 3 = Amex.
 
 ## Configuration
 
@@ -60,6 +84,6 @@ Connection string in `appsettings.json`:
 
 ## Status
 
-**Etapa 2 concluída.** Domain model (Payment, PIX/Card enums) + EF Core + SQLite. Next: POST /payments, GET /payments/{id}.
+**Etapa 3 concluída.** POST /payments (idempotent), GET /payments/{id}. Next: ProblemDetails middleware, API Key auth.
 
 See `portfolio-notes.md` for the roadmap and execution history.

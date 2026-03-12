@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using PayGateway.Api.Endpoints;
 using PayGateway.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,5 +36,8 @@ if (app.Environment.IsDevelopment())
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }))
     .WithName("HealthCheck")
     .WithOpenApi();
+
+var apiV1 = app.MapGroup("/api/v1").WithTags("API v1");
+apiV1.MapPaymentEndpoints();
 
 app.Run();
