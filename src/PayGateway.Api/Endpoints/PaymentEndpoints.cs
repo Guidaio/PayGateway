@@ -3,6 +3,7 @@ using PayGateway.Api.Contracts;
 using PayGateway.Api.ProblemDetails;
 using PayGateway.Api.Services;
 using PayGateway.Domain.Entities;
+using PayGateway.Domain.Services;
 using PayGateway.Infrastructure.Persistence;
 
 namespace PayGateway.Api.Endpoints;
@@ -99,9 +100,7 @@ public static class PaymentEndpoints
         }
 
         var now = DateTime.UtcNow;
-        var status = request.Method == PaymentMethod.Pix
-            ? PaymentStatus.Completed
-            : PaymentStatus.Processing;
+        var status = PaymentStatusResolver.GetInitialStatus(request.Method);
 
         var payment = new Domain.Entities.Payment
         {

@@ -116,6 +116,14 @@ curl -X POST http://localhost:5162/api/v1/payments \
 
 CardBrand: 0 = Visa, 1 = Mastercard, 2 = Elo, 3 = Amex.
 
+## Running tests
+
+```bash
+dotnet test
+```
+
+Unit tests: PaymentStatusResolver (initial status by method). Integration tests: API endpoints with WebApplicationFactory and InMemory database. Tests use `CreateAuthenticatedClient()` (X-API-KEY header). Includes 401 test for unauthenticated requests, 400 for missing Idempotency-Key, 422 for validation errors, 404 for GetById.
+
 ## Technologies
 
 - .NET 8
@@ -124,6 +132,7 @@ CardBrand: 0 = Visa, 1 = Mastercard, 2 = Elo, 3 = Amex.
 - Swagger / OpenAPI
 - Microsoft.Extensions.Http.Resilience (Polly: retry, circuit breaker)
 - BackgroundService + Channel
+- xUnit, Microsoft.AspNetCore.Mvc.Testing
 
 ## Configuration
 
@@ -144,6 +153,6 @@ CardBrand: 0 = Visa, 1 = Mastercard, 2 = Elo, 3 = Amex.
 
 ## Status
 
-**Etapa 8 concluída.** README completo com contexto fintech/POS, arquitetura, modelo de domínio e tecnologias.
+**Etapa 9 concluída.** Testes unitários (PaymentStatusResolver) e de integração (endpoints, 401, 400, 404, 422, idempotência).
 
 See `portfolio-notes.md` for the roadmap and execution history.
