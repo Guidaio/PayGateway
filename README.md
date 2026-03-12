@@ -50,7 +50,7 @@ Base path: `/api/v1`
 
 ### Webhooks
 
-When `webhookUrl` is provided in the request, the gateway POSTs a JSON payload when the payment is created. Retry: 3 attempts (1s, 2s, 4s delays).
+When `webhookUrl` is provided in the request, the gateway POSTs a JSON payload when the payment is created. Resilience: Polly retry (3 attempts, exponential backoff) + circuit breaker (opens after 50% failure ratio, 30s break).
 
 Payload example:
 ```json
@@ -113,6 +113,6 @@ CardBrand: 0 = Visa, 1 = Mastercard, 2 = Elo, 3 = Amex.
 
 ## Status
 
-**Etapa 6 concluída.** Webhooks (callback URL, retry 3x). Next: Polly.
+**Etapa 7 concluída.** Polly (retry + circuit breaker) para webhooks. Next: README.
 
 See `portfolio-notes.md` for the roadmap and execution history.

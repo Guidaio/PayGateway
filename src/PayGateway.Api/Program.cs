@@ -17,7 +17,15 @@ builder.Services.AddAuthentication(ApiKeyAuthenticationHandler.SchemeName)
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("Webhook")
+    .AddStandardResilienceHandler(options =>
+    {
+        options.Retry.MaxRetryAttempts = 3;
+        options.Retry.Delay = TimeSpan.FromSeconds(1);
+        options.CircuitBreaker.FailureRatio = 0.5;
+        options.CircuitBreaker.MinimumThroughput = 3;
+        options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(30);
+    });
 builder.Services.AddSingleton<WebhookDeliveryService>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<WebhookDeliveryService>());
 builder.Services.AddSingleton<IWebhookDeliveryService>(sp => sp.GetRequiredService<WebhookDeliveryService>());
