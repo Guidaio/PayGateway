@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using PayGateway.Api.Endpoints;
 using PayGateway.Api.Middleware;
 using PayGateway.Api.Security;
+using PayGateway.Api.Services;
 using PayGateway.Api.Swagger;
 using PayGateway.Infrastructure.Persistence;
 
@@ -15,6 +16,11 @@ builder.Services.AddAuthentication(ApiKeyAuthenticationHandler.SchemeName)
         _ => { });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<WebhookDeliveryService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<WebhookDeliveryService>());
+builder.Services.AddSingleton<IWebhookDeliveryService>(sp => sp.GetRequiredService<WebhookDeliveryService>());
 
 builder.Services.AddDbContext<PaymentDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));

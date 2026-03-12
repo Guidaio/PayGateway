@@ -46,7 +46,25 @@ Base path: `/api/v1`
 |--------|----------|-------------|
 | GET | /health | Health check (public) |
 | GET | /payments/{id} | Get payment by ID |
-| POST | /payments | Create payment (idempotent; use `Idempotency-Key` header) |
+| POST | /payments | Create payment (idempotent; use `Idempotency-Key` header). Optional `webhookUrl` for callback. |
+
+### Webhooks
+
+When `webhookUrl` is provided in the request, the gateway POSTs a JSON payload when the payment is created. Retry: 3 attempts (1s, 2s, 4s delays).
+
+Payload example:
+```json
+{
+  "eventType": "payment.created",
+  "paymentId": "...",
+  "merchantId": "merchant-123",
+  "amount": 99.99,
+  "currency": "BRL",
+  "method": "Pix",
+  "status": "Completed",
+  "createdAtUtc": "2026-03-12T..."
+}
+```
 
 ### Authentication
 
@@ -95,6 +113,6 @@ CardBrand: 0 = Visa, 1 = Mastercard, 2 = Elo, 3 = Amex.
 
 ## Status
 
-**Etapa 5 concluída.** API Key authentication (X-API-KEY). Next: webhooks, Polly.
+**Etapa 6 concluída.** Webhooks (callback URL, retry 3x). Next: Polly.
 
 See `portfolio-notes.md` for the roadmap and execution history.

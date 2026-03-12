@@ -32,7 +32,8 @@ public class SwaggerExampleFilter : IOperationFilter
                     ["currency"] = new OpenApiString("BRL"),
                     ["method"] = new OpenApiInteger(0),
                     ["pixKey"] = new OpenApiString("user@example.com"),
-                    ["pixKeyType"] = new OpenApiInteger(0)
+                    ["pixKeyType"] = new OpenApiInteger(0),
+                    ["webhookUrl"] = new OpenApiString("https://merchant.example.com/webhooks/payment")
                 };
             }
         }

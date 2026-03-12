@@ -23,4 +23,7 @@ public record CreatePaymentRequest
 
     /// <summary>Card brand (required when Method is Card).</summary>
     public CardBrand? CardBrand { get; init; }
+
+    /// <summary>Optional callback URL. Gateway will POST payment status when completed.</summary>
+    public string? WebhookUrl { get; init; }
 }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PayGateway.Api.Contracts;
 using PayGateway.Api.ProblemDetails;
+using PayGateway.Api.Services;
 using PayGateway.Domain.Entities;
 using PayGateway.Infrastructure.Persistence;
 
@@ -58,6 +59,7 @@ public static class PaymentEndpoints
     private static async Task<IResult> CreatePayment(
         CreatePaymentRequest request,
         PaymentDbContext db,
+        IWebhookDeliveryService webhookService,
         HttpContext httpContext,
         CancellationToken ct)
     {
@@ -120,7 +122,25 @@ public static class PaymentEndpoints
         db.Payments.Add(payment);
         await db.SaveChangesAsync(ct);
 
-        return Results.Created($"/api/v1/payments/{payment.Id}", ToResponse(payment));
+        var response = ToResponse(payment);
+
+        if (!string.IsNullOrWhiteSpace(request.WebhookUrl) && Uri.TryCreate(request.WebhookUrl.Trim(), UriKind.Absolute, out var uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
+        {
+            var webhookPayload = new
+            {
+                eventType = "payment.created",
+                paymentId = payment.Id,
+                merchantId = payment.MerchantId,
+                amount = payment.Amount,
+                currency = payment.Currency,
+                method = payment.Method.ToString(),
+                status = payment.Status.ToString(),
+                createdAtUtc = payment.CreatedAtUtc
+            };
+            await webhookService.EnqueueAsync(request.WebhookUrl.Trim(), webhookPayload, ct);
+        }
+
+        return Results.Created($"/api/v1/payments/{payment.Id}", response);
     }
 
     private static PaymentResponse ToResponse(Domain.Entities.Payment p)
