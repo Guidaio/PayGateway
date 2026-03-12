@@ -48,11 +48,16 @@ Base path: `/api/v1`
 | GET | /payments/{id} | Get payment by ID |
 | POST | /payments | Create payment (idempotent; use `Idempotency-Key` header) |
 
+### Authentication
+
+All endpoints under `/api/v1` require the `X-API-KEY` header. The `/health` endpoint is public.
+
 ### Example: create PIX payment
 
 ```bash
 curl -X POST http://localhost:5162/api/v1/payments \
   -H "Content-Type: application/json" \
+  -H "X-API-KEY: change-me" \
   -H "Idempotency-Key: pay-001" \
   -d '{"merchantId":"merchant-123","amount":99.99,"currency":"BRL","method":0,"pixKey":"user@example.com","pixKeyType":0}'
 ```
@@ -64,6 +69,7 @@ Method: 0 = Pix, 1 = Card. PixKeyType: 0 = Email, 1 = Cpf, 2 = Phone, 3 = Random
 ```bash
 curl -X POST http://localhost:5162/api/v1/payments \
   -H "Content-Type: application/json" \
+  -H "X-API-KEY: change-me" \
   -H "Idempotency-Key: pay-002" \
   -d '{"merchantId":"merchant-123","amount":150.00,"currency":"BRL","method":1,"cardLast4":"4242","cardBrand":0}'
 ```
@@ -72,18 +78,23 @@ CardBrand: 0 = Visa, 1 = Mastercard, 2 = Elo, 3 = Amex.
 
 ## Configuration
 
-Connection string in `appsettings.json`:
+`appsettings.json`:
 
 ```json
 {
   "ConnectionStrings": {
     "DefaultConnection": "Data Source=paygateway.db"
+  },
+  "ApiKey": {
+    "Value": "change-me"
   }
 }
 ```
 
+- **ApiKey:Value**: Required for authentication. All API endpoints (except `/health`) require the `X-API-KEY` header. Use a secure value in production.
+
 ## Status
 
-**Etapa 4 concluída.** ExceptionHandlerMiddleware (500 com ProblemDetails), Swagger com exemplos. Next: API Key auth.
+**Etapa 5 concluída.** API Key authentication (X-API-KEY). Next: webhooks, Polly.
 
 See `portfolio-notes.md` for the roadmap and execution history.
