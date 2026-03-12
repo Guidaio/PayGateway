@@ -4,27 +4,49 @@ Payment gateway simulation (PIX + card). Portfolio project aligned with Senior .
 
 ## Context
 
-PayGateway is an API that simulates a **payment gateway** for processing PIX and card transactions. Planned features include webhooks for async notifications, retry/circuit breaker patterns (Polly), and background services for settlement.
+PayGateway is an API that simulates a **payment gateway** for processing PIX and card transactions. It includes webhooks for async notifications, Polly (retry/circuit breaker) for resilient delivery, and API Key authentication.
 
 **Use case:** Simulated gateway for integration testing, demos, or learning payment flows. Represents the kind of service a fintech or POS platform would integrate with to process payments.
 
-**Planned tech:** .NET 8, Polly (retry/circuit breaker), background services, API Key/JWT authentication.
+**Tech:** .NET 8, EF Core SQLite, minimal APIs, API Key auth, webhooks (BackgroundService + Channel), Polly (Microsoft.Extensions.Http.Resilience).
+
+### Cenários fintech/POS
+
+| Cenário | Descrição |
+|---------|-----------|
+| **Integração POS** | Loja física envia pagamentos PIX/cartão; webhook notifica conclusão. |
+| **E-commerce** | Checkout integra com gateway; Idempotency-Key evita cobrança duplicada em retries. |
+| **SaaS de pagamentos** | API Key por merchant; cada merchant pode configurar webhookUrl para receber eventos. |
 
 ## Architecture
 
 ```
-┌─────────────────┐     ┌──────────────────────────┐     ┌─────────────────────┐
-│  PayGateway.Api │────▶│ PayGateway.Infrastructure │────▶│  PayGateway.Domain  │
-│  (minimal APIs) │     │  (EF Core, SQLite)        │     │  (Payment, enums)   │
-│  /api/v1/*      │     │  (future: Polly, etc.)    │     │                     │
-└─────────────────┘     └──────────────────────────┘     └─────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│  PayGateway.Api                                                         │
+│  (minimal APIs, /api/v1/*, API Key, ProblemDetails, Swagger)            │
+│  WebhookDeliveryService (BackgroundService + Channel) → HttpClient+Polly│
+└─────────────────────────────────────────────────────────────────────────┘
+         │                                    │
+         ▼                                    ▼
+┌──────────────────────────┐     ┌─────────────────────┐
+│ PayGateway.Infrastructure │────▶│  PayGateway.Domain  │
+│  (EF Core, SQLite)        │     │  (Payment, enums)   │
+└──────────────────────────┘     └─────────────────────┘
 ```
 
 | Project | Description |
 |---------|-------------|
-| **PayGateway.Api** | Web API (.NET 8, minimal APIs). Endpoints, Swagger, versioning. |
+| **PayGateway.Api** | Web API (.NET 8, minimal APIs). Endpoints, ProblemDetails, Swagger, API Key, versioning. WebhookDeliveryService (BackgroundService + Channel). |
 | **PayGateway.Domain** | Domain entities: Payment, enums (PaymentMethod, PaymentStatus, PixKeyType, CardBrand). |
 | **PayGateway.Infrastructure** | EF Core, PaymentDbContext, SQLite persistence, Fluent API configurations. |
+
+### Domain model
+
+| Entity | Description |
+|--------|-------------|
+| **Payment** | Payment record. IdempotencyKey for safe retries. Method: Pix (instant) or Card (simulated). Status: Pending, Processing, Completed, Failed, Refunded, Cancelled. |
+| **PIX** | PixKey + PixKeyType (Email, Cpf, Phone, Random). Status Completed immediately. |
+| **Card** | CardLast4 + CardBrand (Visa, Mastercard, Elo, Amex). Status Processing (simulated). |
 
 ## Prerequisites
 
@@ -94,6 +116,15 @@ curl -X POST http://localhost:5162/api/v1/payments \
 
 CardBrand: 0 = Visa, 1 = Mastercard, 2 = Elo, 3 = Amex.
 
+## Technologies
+
+- .NET 8
+- ASP.NET Core minimal APIs
+- Entity Framework Core 8 (SQLite)
+- Swagger / OpenAPI
+- Microsoft.Extensions.Http.Resilience (Polly: retry, circuit breaker)
+- BackgroundService + Channel
+
 ## Configuration
 
 `appsettings.json`:
@@ -113,6 +144,6 @@ CardBrand: 0 = Visa, 1 = Mastercard, 2 = Elo, 3 = Amex.
 
 ## Status
 
-**Etapa 7 concluída.** Polly (retry + circuit breaker) para webhooks. Next: README.
+**Etapa 8 concluída.** README completo com contexto fintech/POS, arquitetura, modelo de domínio e tecnologias.
 
 See `portfolio-notes.md` for the roadmap and execution history.
