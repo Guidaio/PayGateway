@@ -1,0 +1,50 @@
+## Ignore Visual Studio temporary files, build results
+## Get latest from `dotnet new gitignore`
+
+# dotenv files
+.env
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio
+.vs/
+*.DotSettings.user
+
+# .NET
+project.lock.json
+artifacts/
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+
+# Coverage
+coverage*.json
+coverage*.xml
+*.coverage
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
